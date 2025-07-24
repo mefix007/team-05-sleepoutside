@@ -3,9 +3,11 @@ export default class Product {
   this.productId = productId;
   this.product = {};
   this.dataSource = dataSource;
+  this.product.quantity = 1;
 }
     async init() {
       this.product = await this.dataSource.findProductById(this.productId);
+      this.product.quantity = 1; // Default quantity
     
 
     if (this.product) {
@@ -15,11 +17,18 @@ export default class Product {
     }
   }
   addProductToCart() {
+    console.log("Adding product to cart:", this.product);
     let cartItems = JSON.parse(localStorage.getItem("so-cart")) || [];
     if (!Array.isArray(cartItems) && cartItems !== null) {
       cartItems = [cartItems];
     }
-    cartItems.push(this.product);
+    const existingProduct = cartItems.find(item => item.Id === this.product.Id);
+
+    if (existingProduct) {  
+      existingProduct.quantity += 1; // Increment quantity if product already in cart
+    } else {
+      cartItems.push(this.product); // Add new product to cart
+    }
     localStorage.setItem("so-cart", JSON.stringify(cartItems));
   }
 
